@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pets for Sale</title>
+  <link rel="stylesheet" href="sellpets.css">
+</head>
+<body>
+  <h1>Pets Available for Sale</h1>
+  
+  <!-- Search Bar -->
+  <div id="search-bar-container" style="text-align: center; margin-bottom: 20px;">
+    <input 
+      type="text" 
+      id="search-bar" 
+      placeholder="Search Pets by name, breed, or other details..." 
+      style="padding: 10px; width: 300px; border-radius: 5px; border: 1px solid #ddd;" 
+    />
+    <button id="search-button" style="padding: 10px; margin-left: 10px; border-radius: 5px; border: 1px solid #ddd; cursor: pointer;">
+      Search
+    </button>
+  </div>
+
+  <!-- Pet List -->
+  <section id="sell" class="pet-section">
+    <div class="pet-grid" id="sellGrid"></div>
+  </section>
+
+  <!-- Modal for Pet Details -->
+  <div id="petModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="petDetails" class="modal-details"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4l9MAjo0nwg8svNH2nCe1amzsRnu11Lk",
+      authDomain: "adopet-9b45a.firebaseapp.com",
+      databaseURL: "https://adopet-9b45a-default-rtdb.firebaseio.com",
+      projectId: "adopet-9b45a",
+      storageBucket: "adopet-9b45a.appspot.com",
+      messagingSenderId: "528567839616",
+      appId: "1:528567839616:web:def598f1423ef83ab6f65",
+      measurementId: "G-GK1YF97X41"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // References and elements
+    const petRef = ref(database, "petsForSale");
+    const sellGrid = document.getElementById("sellGrid");
+    const modal = document.getElementById("petModal");
+    const modalDetails = document.getElementById("petDetails");
+    const closeModal = document.querySelector(".close");
+
+    let pets = [];
+
+    // Fetch pets from Firebase
+    onValue(petRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log("Fetched data structure:", data); // Log the entire data structure
+
+      if (data) {
+        pets = [];
+        // Traverse the pets and push them to the pets array
+        for (const petId in data) {
+          const pet = data[petId];
+          pets.push(pet);
+        }
+        displayPets(pets);
+      } else {
+        console.log("No data available");
+      }
+    });
+
+    // Function to display pets
+    function displayPets(petList) {
+      sellGrid.innerHTML = ""; // Clear previous content
+      petList.forEach(pet => {
+        const petCard = document.createElement("div");
+        petCard.className = "pet-card";
+
+        // Ensure that all properties exist before displaying them
+        petCard.innerHTML = `
+          <div class="status-box" style="background-color: ${pet.status === "Sold" ? "#4CAF50" : "#FFC107"}; color: white; padding: 5px; border-radius: 5px; text-align: center; margin-bottom: 10px;">
+            ${pet.status || "Available"}
+          </div>
+          <img src="${pet.photo || 'placeholder.jpg'}" alt="${pet.petName || 'Unknown'}" class="pet-image">
+          <h2>${pet.petName || 'Unknown'} (${pet.petSex || 'N/A'})</h2>
+          <p><strong>Breed:</strong> ${pet.petBreed || 'N/A'}</p>
+          <p><strong>Price:</strong> $${pet.price || 'N/A'}</p>
+        `;
+
+        // Show modal on click
+        petCard.addEventListener("click", () => {
+          modalDetails.innerHTML = `
+            <img src="${pet.photo || 'placeholder.jpg'}" alt="${pet.petName || 'Unknown'}" class="modal-image">
+            <h2>${pet.petName || 'Unknown'}</h2>
+            <p><strong>Breed:</strong> ${pet.petBreed || 'N/A'}</p>
+            <p><strong>Age:</strong> ${pet.petAge || 'N/A'} years</p>
+            <p><strong>Price:</strong> $${pet.price || 'N/A'}</p>
+            <p><strong>Contact:</strong> ${pet.contact || 'N/A'}</p>
+            <div class="button-group">
+              <a href="../chat.html">
+                <button class="btn primary chat-btn">Chat with Seller</button>
+              </a>
+              <a href="ConfirmBuyOrder.html">
+                <button class="btn primary get-pet-btn">Buy This Pet</button>
+              </a>
+            </div>
+          `;
+          modal.style.display = "block";
+        });
+
+        sellGrid.appendChild(petCard);
+      });
+    }
+
+    // Close modal
+    closeModal.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+
+    // Search functionality
+    const searchButton = document.getElementById("search-button");
+    const searchBar = document.getElementById("search-bar");
+
+    searchButton.addEventListener("click", () => {
+      const searchQuery = searchBar.value.toLowerCase();
+
+      if (!searchQuery) {
+        displayPets(pets); // Show all pets if search is empty
+      } else {
+        const filteredPets = pets.filter(pet => {
+          const petName = pet.petName ? pet.petName.toLowerCase() : "";
+          const breed = pet.petBreed ? pet.petBreed.toLowerCase() : "";
+          const price = pet.price ? pet.price.toString().toLowerCase() : "";
+          const sex = pet.petSex ? pet.petSex.toLowerCase() : "";
+
+          return (
+            petName.includes(searchQuery) ||
+            breed.includes(searchQuery) ||
+            price.includes(searchQuery) ||
+            sex.includes(searchQuery)
+          );
+        });
+
+        displayPets(filteredPets);
+      }
+    });
+  </script>
+</body>
+</html>

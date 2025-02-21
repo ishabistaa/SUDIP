@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Pet for Sale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="file"] {
+            padding: 5px;
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .form-group-inline {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .form-group-inline .form-group {
+            flex: 1;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #dbdb0c;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #e3e716;
+        }
+        .terms {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .terms label {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Post a Pet for Sale</h2>
+    <form id="petForm">
+        <div class="form-group">
+            <label for="photo">Pet Photo</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+        </div>
+        <div class="form-group">
+            <label for="name">Pet Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter pet's name" required>
+        </div>
+        <div class="form-group">
+            <label for="breed">Breed</label>
+            <input type="text" id="breed" name="breed" placeholder="Enter breed" required>
+        </div>
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="age">Age (in years)</label>
+                <input type="number" id="age" name="age" placeholder="Enter age" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" required>
+                    <option value="">Select sex</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="weight">Weight (in kg)</label>
+                <input type="number" id="weight" name="weight" placeholder="Enter weight" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="vaccinations">Total Vaccinations Done</label>
+                <input type="number" id="vaccinations" name="vaccinations" placeholder="Enter count" min="0" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="lastVaccinationDate">Last Vaccination Date</label>
+            <input type="date" id="lastVaccinationDate" name="lastVaccinationDate" required>
+        </div>
+        <div class="form-group">
+            <label for="vetDocs">Vet or Vaccination Documents</label>
+            <input type="file" id="vetDocs" name="vetDocs" accept=".pdf,.jpg,.png" multiple>
+        </div>
+        <div class="form-group">
+            <label for="description">Extra Description</label>
+            <textarea id="description" name="description" placeholder="Enter extra details"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="price">Price (in Rs)</label>
+            <input type="number" id="price" name="price" placeholder="Enter price" min="0" required>
+        </div>
+        <div class="form-group">
+            <label for="contact">Contact Information</label>
+            <input type="text" id="contact" name="contact" placeholder="Enter your phone/email" required>
+        </div>
+       
+        <button type="submit" class="submit-btn">Post Pet</button>
+    </form>
+</div>
+
+<script type="module" src="postForSell.js"></script>
+</body>
+</html>

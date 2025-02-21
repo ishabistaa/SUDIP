@@ -1,0 +1,235 @@
+
+
+4
+
+Share
+
+
+You said:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a Pet</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    button {
+      background-color: #dbde21;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #ddd613;
+    }
+
+    input[type="file"] {
+      padding: 5px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #28a745;
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Post a Pet for Adoption</h1>
+    <form id="petForm">
+      <div class="form-group">
+        <label for="petPhoto">Photo</label>
+        <input type="file" id="petPhoto" name="petPhoto" accept="image/*" required>
+      </div>
+      <div class="form-group">
+        <label for="petName">Pet Name</label>
+        <input type="text" id="petName" name="petName" placeholder="Enter pet's name" required>
+      </div>
+      <div class="form-group">
+        <label for="breed">Breed</label>
+        <input type="text" id="breed" name="breed" placeholder="Enter pet's breed" required>
+      </div>
+      <div class="form-group">
+        <label for="age">Age (in years)</label>
+        <input type="number" id="age" name="age" min="0" step="0.1" placeholder="Enter pet's age" required>
+      </div>
+      <div class="form-group">
+        <label for="sex">Sex</label>
+        <select id="sex" name="sex" required>
+          <option value="" disabled selected>Select pet's sex</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="weight">Weight (in kg)</label>
+        <input type="number" id="weight" name="weight" min="0" step="0.1" placeholder="Enter pet's weight" required>
+      </div>
+      <div class="form-group">
+        <label for="vaccinationDate">Last Vaccination Date</label>
+        <input type="date" id="vaccinationDate" name="vaccinationDate">
+      </div>
+      <div class="form-group">
+        <label for="totalVaccinations">Total Vaccinations Done</label>
+        <input type="number" id="totalVaccinations" name="totalVaccinations" min="0" placeholder="Enter total vaccinations">
+      </div>
+      <div class="form-group">
+        <label for="vetDocuments">Vet or Vaccination Documents</label>
+        <input type="file" id="vetDocuments" name="vetDocuments" multiple>
+      </div>
+      <div class="form-group">
+        <label for="description">Additional Description</label>
+        <textarea id="description" name="description" rows="5" placeholder="Enter additional details about the pet"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" placeholder="Enter your location" required>
+      </div>
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+          <option value="adoption">Adoption</option>
+          <option value="sale">Sale</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button type="submit">Post Pet</button>
+      </div>
+    </form>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4l9MAjo0nwg8svNH2nCe1amzsRnu11Lk",
+      authDomain: "adopet-9b45a.firebaseapp.com",
+      databaseURL: "https://adopet-9b45a-default-rtdb.firebaseio.com",
+      projectId: "adopet-9b45a",
+      storageBucket: "adopet-9b45a.appspot.com",
+      messagingSenderId: "528567839616",
+      appId: "1:528567839616:web:def598f1423ef83ab6f65",
+      measurementId: "G-GK1YF97X41",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const auth = getAuth(app);
+
+    const petForm = document.getElementById('petForm');
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("Please log in to post pets.");
+        window.location.href = "./login.html";
+        return;
+      }
+
+      petForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const petName = document.getElementById("petName").value;
+        const petBreed = document.getElementById("breed").value;
+        const petAge = document.getElementById("age").value;
+        const petDescription = document.getElementById("description").value;
+        const location = document.getElementById("location").value;
+        const category = document.getElementById("category").value;
+        const sex = document.getElementById("sex").value;
+        const weight = document.getElementById("weight").value;
+        const vaccinationDate = document.getElementById("vaccinationDate").value;
+        const totalVaccinations = document.getElementById("totalVaccinations").value;
+
+        const adoptionRef = ref(database, "adoption");
+        const newPetRef = push(adoptionRef);
+
+        set(newPetRef, {
+          petName,
+          petBreed,
+          petAge,
+          petDescription,
+          location,
+          category,
+          sex,
+          weight,
+          vaccinationDate,
+          totalVaccinations,
+          posterEmail: user.email,
+        })
+          .then(() => {
+            alert("Pet posted successfully!");
+            petForm.reset();
+            window.location.href = "./backend/profile.html";
+          })
+          .catch((error) => {
+            console.error("Error posting pet:", error);
+            alert("Failed to post pet. Please try again.");
+          });
+      });
+    });
+  </script>
+</body>
+</html
